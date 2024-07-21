@@ -1,0 +1,13 @@
+body {
+  font-size: 16px;
+}
+
+section .slide-content {
+  max-width: 100%;
+  overflow: auto;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
