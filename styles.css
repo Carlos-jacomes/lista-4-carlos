@@ -11,3 +11,7 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+div#header {
+  padding: 10px;
+}
