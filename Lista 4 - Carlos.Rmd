@@ -1,0 +1,93 @@
+---
+title: "Lista 4 - Carlos"
+author: "Carlos Jacomes"
+date: "2024-07-21"
+output: 
+  ioslides_presentation:
+    css: styles.css
+---
+
+## Introdução
+
+Gráfico com estimativas intervalares utilizando as variáveis "Cor/raça" e "Classificação da ocupação."
+
+Destaca-se que está sendo utilizada uma base com dados sobre Ocupação e classe dos candidatos à deputado federal na Bahia às eleições de 2022.
+
+## Código do Gráfico
+
+```{r setup, include=FALSE}
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(purrr)
+library(broom)
+
+# Carregar os dados do Excel
+classificacao <- read_excel(
+  "C:/Users/User/OneDrive/Documentos/metodos/classificacao.xlsx"
+)
+head(classificacao)
+
+# Calcular o número total de observações
+total_n <- nrow(classificacao)
+
+# Calcular as proporções e intervalos de confiança
+proporcoes <- classificacao %>%
+  group_by(`Cor/raça`, `Classificação da ocupação`) %>%
+  summarise(n = n(), .groups = 'drop') %>%
+  mutate(proporcao = n / total_n,
+         ci = map(n, ~binom.test(.x, total_n)$conf.int),
+         lower_ci = map_dbl(ci, 1),
+         upper_ci = map_dbl(ci, 2))
+
+# Visualizar as proporções calculadas
+print(proporcoes)
+```
+
+
+```{r eval=FALSE}
+ggplot(proporcoes, 
+       aes(x = `Classificação da ocupação`, 
+           y = proporcao, 
+           fill = `Cor/raça`)) +
+  geom_bar(stat = "identity", 
+           position = "dodge") +
+  geom_errorbar(aes(ymin = lower_ci, 
+                    ymax = upper_ci), 
+                position = position_dodge(width = 0.9), 
+                width = 0.2) +
+  labs(title = "Distribuição Racial por Classe Social das Candidaturas
+       nas Eleições de 2022",
+       x = "Classificação da Ocupação",
+       y = "Proporção") +
+  theme_minimal()
+
+```
+
+
+## Gráfico
+
+```{r echo=FALSE}
+# Gerar gráfico
+ggplot(proporcoes, 
+       aes(x = `Classificação da ocupação`, 
+           y = proporcao, 
+           fill = `Cor/raça`)) +
+  geom_bar(stat = "identity", 
+           position = "dodge") +
+  geom_errorbar(aes(ymin = lower_ci, 
+                    ymax = upper_ci), 
+                position = position_dodge(width = 0.9), 
+                width = 0.2) +
+  labs(title = "Distribuição Racial por Classe Social das Candidaturas
+       nas Eleições de 2022",
+       x = "Classificação da Ocupação",
+       y = "Proporção") +
+  theme_minimal()
+
+```
+
+## Parte 2 - formulação de uma hipótese
+
+Hipótese: candidaturas de candidatos não branco(a)s se concentram nas classes mais baixas e de brancos se concentram nas classes mais altas.
+
